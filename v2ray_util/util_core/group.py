@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import json
 import base64
-
+from urllib.parse import quote
 from .utils import ColorStr
 
 __author__ = 'Jrohy'
@@ -98,21 +98,40 @@ class Socks(User):
         return "socks"
 
 class Vless(User):
-    def __init__(self, uuid, user_number, encryption=None, email=None):
+    def __init__(self, uuid, user_number, encryption=None, email=None, network=None, path=None, host=None):
         super(Vless, self).__init__(user_number, uuid, email)
         self.encryption = encryption
+        self.path = path
+        self.host = host
+        self.network = network
 
     def __str__(self):
+        email = ""
         if self.user_info:
-            return "Email: {self.user_info}\nProtocol: {network}\nId: {password}\nEncryption: {self.encryption}\n".format(self=self, network=self.stream(), password=self.password)
-        else:
-            return "Protocol: {network}\nId: {password}\nEncryption: {self.encryption}\n".format(self=self, network=self.stream(), password=self.password)
+            email = "Email: {}".format(self.user_info)
+        result = '''
+{email}
+ID: {password}
+Encryption: {self.encryption}
+Network: {network}
+'''.format(self=self, password=self.password, email=email, network=self.stream()).strip() + "\n"
+        return result
     
     def stream(self):
-        return "VLESS"
+        if self.network == "ws":
+            return "VLESS WebSocket host: {0}, path: {1}".format(self.host, self.path)
+        elif self.network == "tcp":
+            return "VLESS"
 
     def link(self, ip, port, tls):
-        return ""
+        result_link = "vless://{s.password}@{ip}:{port}?encryption={s.encryption}".format(s=self, ip=ip, port=port)
+        if tls == "tls":
+            result_link += "&security=tls"
+        if self.network == "ws":
+            result_link += "&type=ws&&host={0}&path={1}".format(self.host, quote(self.path))
+        elif self.network == "tcp":
+            result_link += "&type=tcp"
+        return ColorStr.green(result_link)
 
 class Xtls(Vless):
     def __init__(self, uuid, user_number, encryption=None, email=None, flow=""):
@@ -129,7 +148,8 @@ class Xtls(Vless):
         return "VLESS_XTLS"
     
     def link(self, ip, port, tls):
-        return ""
+        result_link = "vless://{s.password}@{ip}:{port}?encryption={s.encryption}&security=xtls&flow={s.flow}".format(s=self, ip=ip, port=port)
+        return ColorStr.green(result_link)
 
 class Vmess(User):
     def __init__(self, uuid, alter_id: int, network: str, user_number, *, path=None, host=None, header=None, email=None, quic=None):

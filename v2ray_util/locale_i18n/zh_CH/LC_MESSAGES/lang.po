@@ -33,10 +33,16 @@ msgstr "修改成功!"
 ### 通用翻译 end ###
 
 ### main.py start ###
-msgid "Welcome to v2ray-util"
-msgstr "欢迎使用 v2ray-util 管理程序"
+msgid "Welcome to v2ray manager"
+msgstr "欢迎使用 v2ray 管理程序"
+
+msgid "Welcome to xray manager"
+msgstr "欢迎使用 xray 管理程序"
 
 msgid "1.V2ray Manage"
+msgstr "1.服务管理"
+
+msgid "1.Xray Manage"
 msgstr "1.服务管理"
 
 msgid "2.Group Manage"
@@ -51,8 +57,11 @@ msgstr "4.查看配置"
 msgid "5.Global Setting"
 msgstr "5.全局功能"
 
-msgid "6.Update V2Ray"
-msgstr "6.更新V2Ray"
+msgid "6.Update V2ray"
+msgstr "6.更新V2ray"
+
+msgid "6.Update Xray"
+msgstr "6.更新Xray"
 
 msgid "7.Generate Client Json"
 msgstr "7.生成客户端配置文件"
@@ -60,16 +69,31 @@ msgstr "7.生成客户端配置文件"
 msgid "start v2ray"
 msgstr "启动服务"
 
+msgid "start xray"
+msgstr "启动服务"
+
 msgid "stop v2ray"
+msgstr "停止服务"
+
+msgid "stop xray"
 msgstr "停止服务"
 
 msgid "restart v2ray"
 msgstr "重启服务"
 
+msgid "restart xray"
+msgstr "重启服务"
+
 msgid "v2ray status"
 msgstr "运行状态"
 
+msgid "xray status"
+msgstr "运行状态"
+
 msgid "v2ray log"
+msgstr "运行日志"
+
+msgid "xray log"
 msgstr "运行日志"
 
 msgid "add user"
@@ -120,6 +144,9 @@ msgstr "走CDN(需要域名)"
 msgid "V2ray Traffic Statistics"
 msgstr "流量统计(v2ray)"
 
+msgid "Xray Traffic Statistics"
+msgstr "流量统计(xray)"
+
 msgid "Iptables Traffic Statistics"
 msgstr "流量统计(iptables)"
 
@@ -129,8 +156,14 @@ msgstr "禁止bittorrent"
 msgid "Schedule Update V2ray"
 msgstr "定时更新V2ray"
 
-msgid "Clean Log"
+msgid "Schedule Update Xray"
+msgstr "定时更新Xray"
+
+msgid "Clean V2ray Log"
 msgstr "清理v2ray日志"
+
+msgid "Clean Xray Log"
+msgstr "清理xray日志"
 
 msgid "Change Language"
 msgstr "Switch to English"
@@ -149,13 +182,6 @@ msgid "generate client json"
 msgstr "生成客户端json"
 
 ### client.py end ###
-
-### converter.py start ###
-
-msgid "tranfrom to v2ray new version json.."
-msgstr "转换配置文件格式中.."
-
-### converter.py end ###
 
 ### group.py start ###
 
@@ -201,14 +227,26 @@ msgstr "是否存在"
 msgid "clean v2ray log success!"
 msgstr "清理v2ray日志成功!"
 
+msgid "clean xray log success!"
+msgstr "清理xray日志成功!"
+
 msgid "ipv6 network not support update v2ray online, please manual donwload v2ray to update!"
 msgstr "ipv6 网络不支持v2ray的在线更新, 请手动下载v2ray来更新!"
+
+msgid "ipv6 network not support update xray online, please manual donwload xray to update!"
+msgstr "ipv6 网络不支持xray的在线更新, 请手动下载xray来更新!"
 
 msgid "download v2ray-linux-xx.zip and run 'bash <(curl -L -s https://multi.netlify.app/go.sh) -l v2ray-linux-xx.zip' to update"
 msgstr "下载v2ray-linux-xx.zip包然后运行 'bash <(curl -L -s https://multi.netlify.app/go.sh) -l v2ray-linux-xx.zip' 来更新"
 
+msgid "download Xray-linux-xx.zip and run 'bash <(curl -L -s https://multi.netlify.app/go.sh) -l Xray-linux-xx.zip -x' to update"
+msgstr "下载Xray-linux-xx.zip包然后运行 'bash <(curl -L -s https://multi.netlify.app/go.sh) -l Xray-linux-xx.zip -x' 来更新"
+
 msgid "check v2ray no install, auto install v2ray.."
 msgstr "检测到本机没安装v2ray, 正在自动安装.."
+
+msgid "check xray no install, auto install xray.."
+msgstr "检测到本机没安装xray, 正在自动安装.."
 
 ### v2ray.py end ###
 
@@ -277,6 +315,9 @@ msgstr "当前无流量数据, 请使用流量片刻再来查看统计!"
 msgid "V2ray Traffic Statistics Status"
 msgstr "当前V2ray流量统计状态"
 
+msgid "Xray Traffic Statistics Status"
+msgstr "当前Xray流量统计状态"
+
 msgid "1.open statistics"
 msgstr "1.开启流量统计"
 
@@ -295,8 +336,14 @@ msgstr "5.重置流量统计"
 msgid "tip: restart v2ray will reset traffic statistics!!!"
 msgstr "tip: 重启v2ray会重置流量统计!!!"
 
+msgid "tip: restart xray will reset traffic statistics!!!"
+msgstr "tip: 重启xray会重置流量统计!!!"
+
 msgid "open traffic statistics will close schedule update v2ray, continue?(y/n): "
 msgstr "开启流量统计会关闭定时更新v2ray服务, 是否继续y/n: "
+
+msgid "open traffic statistics will close schedule update xray, continue?(y/n): "
+msgstr "开启流量统计会关闭定时更新xray服务, 是否继续y/n: "
 
 msgid "undo open traffic statistics!!"
 msgstr "撤销开启流量统计!!"
@@ -413,6 +460,9 @@ msgstr "修改tcpFastOpen"
 msgid "V2ray MTProto/Shadowsocks don't support tcpFastOpen!!!"
 msgstr "V2ray MTProto/Shadowsocks协议不支持配置tcpFastOpen!!!"
 
+msgid "Xray MTProto/Shadowsocks don't support tcpFastOpen!!!"
+msgstr "Xray MTProto/Shadowsocks协议不支持配置tcpFastOpen!!!"
+
 msgid "group tcpFastOpen"
 msgstr "当前组的tcpFastOpen状态"
 
@@ -469,10 +519,10 @@ msgid "local group is socks, please input user and password to create user"
 msgstr "当前组为socks组, 请输入用户密码创建新的socks用户"
 
 msgid "Mtproto protocol only support one user!!"
-msgstr "当前选择的组为MTProto协议, V2ray只支持该协议同组的第一个用户生效, 所以没必要新增用户!"
+msgstr "当前选择的组为MTProto协议, 该协议只支持同组的第一个用户生效, 所以没必要新增用户!"
 
 msgid "Shadowsocks protocol only support one user, u can add new port to multiple SS!"
-msgstr "当前选择的组为Shadowsocks协议, V2ray只支持ss协议一个用户一个端口, 想多用户请新增端口!"
+msgstr "当前选择的组为Shadowsocks协议, ss协议只支持一个用户一个端口, 想多用户请新增端口!"
 
 msgid "del group info: "
 msgstr "你要删除的Group组所有节点信息: "
@@ -485,6 +535,12 @@ msgstr "撤销删除"
 
 msgid "del user info:"
 msgstr "你选择的user信息:"
+
+msgid "create random trojan user password:"
+msgstr "生成随机trojan用户密码:"
+
+msgid ", enter to use or input new password: "
+msgstr ", 回车直接使用或者输入自定义密码: "
 
 ### multiple.py end ###
 
@@ -519,7 +575,7 @@ msgstr "成功"
 ### stream.py start ###
 
 msgid "please input fake domain: "
-msgstr "请输入你想要为伪装的域名(不不不需要http):"
+msgstr "请输入伪装域名(不需要直接回车):"
 
 msgid "please select ss method: "
 msgstr "请输入序号选择加密方法: "
@@ -545,17 +601,14 @@ msgstr "请输入数字!"
 msgid "V2ray MTProto/Shadowsocks not support https, close tls success!"
 msgstr "V2ray MTProto/Shadowsocks不支持https, 关闭tls成功!"
 
+msgid "Xray MTProto/Shadowsocks not support https, close tls success!"
+msgstr "Xray MTProto/Shadowsocks不支持https, 关闭tls成功!"
+
 msgid "modify protocol success"
 msgstr "传输模式修改成功!"
 
 msgid "auto switch 443 port.."
 msgstr "自动切换到443端口..."
-
-msgid "please input trojan user password: "
-msgstr "请输入trojan用户密码: "
-
-msgid "password is null!!"
-msgstr "密码为空!!! "
 
 ### stream.py end ###
 
@@ -606,8 +659,8 @@ msgstr "1.开启 TLS"
 msgid "2.close TLS"
 msgstr "2.关闭 TLS"
 
-msgid "V2ray MTProto/Shadowsocks protocol not support https!!!"
-msgstr "V2ray MTProto/Shadowsocks协议不支持配置https!!!"
+msgid "MTProto/Shadowsocks protocol not support https!!!"
+msgstr "MTProto/Shadowsocks协议不支持配置https!!!"
 
 ### tls.py end ###
 
@@ -630,6 +683,9 @@ msgstr "必须先关闭cdn的代理!"
 msgid "please select https port to cdn: "
 msgstr "请选择走https cdn端口的序号: "
 
+msgid "please select protocol to cdn: "
+msgstr "请选择走cdn的协议: "
+
 ### update_timer.py start ###
 
 msgid "open"
@@ -641,6 +697,9 @@ msgstr "关闭"
 msgid "schedule update v2ray task"
 msgstr "当前定时更新任务状态"
 
+msgid "schedule update xray task"
+msgstr "当前定时更新任务状态"
+
 msgid "1.open schedule task"
 msgstr "1.开启定时更新任务"
 
@@ -649,6 +708,9 @@ msgstr "2.关闭定时更新任务"
 
 msgid "Tip: open schedule update v2ray at 3:00"
 msgstr "Tip: 开启定时更新v2ray的更新时间为每天北京时间3:00更新"
+
+msgid "Tip: open schedule update xray at 3:00"
+msgstr "Tip: 开启定时更新xray的更新时间为每天北京时间3:00更新"
 
 msgid "have open schedule!"
 msgstr "当前定时更新已开启,无需重复操作!"

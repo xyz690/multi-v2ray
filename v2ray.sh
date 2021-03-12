@@ -8,9 +8,6 @@ BEIJING_UPDATE_TIME=3
 #记录最开始运行脚本的路径
 BEGIN_PATH=$(pwd)
 
-# 0: ipv4, 1: ipv6
-NETWORK=0
-
 #安装方式, 0为全新安装, 1为保留v2ray配置更新
 INSTALL_WAY=0
 
@@ -60,7 +57,7 @@ while [[ $# > 0 ]];do
         ;;
         -k|--keep)
         INSTALL_WAY=1
-        colorEcho ${BLUE} "keep v2ray profile to update\n"
+        colorEcho ${BLUE} "keep config to update\n"
         ;;
         --zh)
         CHINESE=1
@@ -77,8 +74,8 @@ done
 help(){
     echo "bash v2ray.sh [-h|--help] [-k|--keep] [--remove]"
     echo "  -h, --help           Show help"
-    echo "  -k, --keep           keep the v2ray config.json to update"
-    echo "      --remove         remove v2ray && multi-v2ray"
+    echo "  -k, --keep           keep the config.json to update"
+    echo "      --remove         remove v2ray,xray && multi-v2ray"
     echo "                       no params to new install"
     return 0
 }
@@ -89,6 +86,11 @@ removeV2Ray() {
     rm -rf /etc/v2ray >/dev/null 2>&1
     rm -rf /var/log/v2ray >/dev/null 2>&1
 
+    #卸载Xray脚本
+    bash <(curl -L -s https://multi.netlify.app/go.sh) --remove -x >/dev/null 2>&1
+    rm -rf /etc/xray >/dev/null 2>&1
+    rm -rf /var/log/xray >/dev/null 2>&1
+
     #清理v2ray相关iptable规则
     bash <(curl -L -s $CLEAN_IPTABLES_SHELL)
 
@@ -96,12 +98,13 @@ removeV2Ray() {
     pip uninstall v2ray_util -y
     rm -rf /usr/share/bash-completion/completions/v2ray.bash >/dev/null 2>&1
     rm -rf /usr/share/bash-completion/completions/v2ray >/dev/null 2>&1
+    rm -rf /usr/share/bash-completion/completions/xray >/dev/null 2>&1
     rm -rf /etc/bash_completion.d/v2ray.bash >/dev/null 2>&1
     rm -rf /usr/local/bin/v2ray >/dev/null 2>&1
     rm -rf /etc/v2ray_util >/dev/null 2>&1
 
     #删除v2ray定时更新任务
-    crontab -l|sed '/SHELL=/d;/v2ray/d' > crontab.txt
+    crontab -l|sed '/SHELL=/d;/v2ray/d'|sed '/SHELL=/d;/xray/d' > crontab.txt
     crontab crontab.txt >/dev/null 2>&1
     rm -f crontab.txt >/dev/null 2>&1
 
@@ -113,6 +116,7 @@ removeV2Ray() {
 
     #删除multi-v2ray环境变量
     sed -i '/v2ray/d' ~/$ENV_FILE
+    sed -i '/xray/d' ~/$ENV_FILE
     source ~/$ENV_FILE
 
     colorEcho ${GREEN} "uninstall success!"
@@ -124,14 +128,6 @@ closeSELinux() {
         sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
         setenforce 0
     fi
-}
-
-judgeNetwork() {
-    curl http://api.ipify.org &>/dev/null
-    if [[ $? != 0 ]];then
-        [[ `curl -s icanhazip.com` =~ ":" ]] && NETWORK=1
-    fi
-    export NETWORK=$NETWORK
 }
 
 checkSys() {
@@ -160,7 +156,7 @@ installDependent(){
     fi
 
     #install python3 & pip
-    bash <(curl -sL https://python3.netlify.app/install.sh)
+    source <(curl -sL https://python3.netlify.app/install.sh)
 }
 
 updateProject() {
@@ -179,6 +175,8 @@ updateProject() {
 
     rm -f /usr/local/bin/v2ray >/dev/null 2>&1
     ln -s $(which v2ray-util) /usr/local/bin/v2ray
+    rm -f /usr/local/bin/xray >/dev/null 2>&1
+    ln -s $(which v2ray-util) /usr/local/bin/xray
 
     #移除旧的v2ray bash_completion脚本
     [[ -e /etc/bash_completion.d/v2ray.bash ]] && rm -f /etc/bash_completion.d/v2ray.bash
@@ -186,14 +184,14 @@ updateProject() {
 
     #更新v2ray bash_completion脚本
     curl $BASH_COMPLETION_SHELL > /usr/share/bash-completion/completions/v2ray
-    [[ -z $(echo $SHELL|grep zsh) ]] && source /usr/share/bash-completion/completions/v2ray
-    
-    #安装/更新V2ray主程序
-    if [[ $NETWORK == 1 ]];then
-        bash <(curl -L -s https://multi.netlify.app/go.sh) --source jsdelivr
-    else
-        bash <(curl -L -s https://multi.netlify.app/go.sh)
+    curl $BASH_COMPLETION_SHELL > /usr/share/bash-completion/completions/xray
+    if [[ -z $(echo $SHELL|grep zsh) ]];then
+        source /usr/share/bash-completion/completions/v2ray
+        source /usr/share/bash-completion/completions/xray
     fi
+    
+    #安装V2ray主程序
+    [[ ${INSTALL_WAY} == 0 ]] && bash <(curl -L -s https://multi.netlify.app/go.sh)
 }
 
 #时间同步
@@ -222,11 +220,7 @@ profileInit() {
     [[ -z $(grep PYTHONIOENCODING=utf-8 ~/$ENV_FILE) ]] && echo "export PYTHONIOENCODING=utf-8" >> ~/$ENV_FILE && source ~/$ENV_FILE
 
     #全新安装的新配置
-    if [[ ${INSTALL_WAY} == 0 ]];then 
-        v2ray new
-    else
-        v2ray convert
-    fi
+    [[ ${INSTALL_WAY} == 0 ]] && v2ray new
 
     echo ""
 }
@@ -238,16 +232,17 @@ installFinish() {
     [[ ${INSTALL_WAY} == 0 ]] && WAY="install" || WAY="update"
     colorEcho  ${GREEN} "multi-v2ray ${WAY} success!\n"
 
-    clear
+    if [[ ${INSTALL_WAY} == 0 ]]; then
+        clear
 
-    v2ray info
+        v2ray info
 
-    echo -e "please input 'v2ray' command to manage v2ray\n"
+        echo -e "please input 'v2ray' command to manage v2ray\n"
+    fi
 }
 
 
 main() {
-    judgeNetwork
 
     [[ ${HELP} == 1 ]] && help && return
 

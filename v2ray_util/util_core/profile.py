@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import json
-import time
 import os
 
+from v2ray_util import run_type
 from .config import Config
 from .utils import ColorStr, get_ip
 from .group import SS, Socks, Vmess, Vless, Mtproto, Quic, Group, Dyport, Trojan, Xtls
@@ -39,12 +39,6 @@ class Profile:
         with open(self.path, 'r') as json_file:
             self.config = json.load(json_file)
 
-        if "inbounds" not in self.config:
-            import converter
-            self.modify_time = os.path.getmtime(self.path)
-            with open(self.path, 'r') as json_file:
-                self.config = json.load(json_file)
-
         #读取配置文件大框架
         conf_inbounds = self.config["inbounds"]
         conf_rules = self.config["routing"]["rules"]
@@ -79,7 +73,7 @@ class Profile:
                 self.group_list.append(group)
         
         if len(self.group_list) == 0:
-            print("v2ray json no streamSettings item, please run {} to recreate v2ray json!".format(ColorStr.cyan("v2ray_util new")))
+            print("{} json no streamSettings item, please run {} to recreate {} json!".format(run_type, ColorStr.cyan("{} new".format(run_type)), run_type))
 
         del self.config
 
@@ -169,7 +163,7 @@ class Profile:
                 if tls == "xtls":
                     node = Xtls(client["id"], self.user_number, conf_settings["decryption"], email, client["flow"])
                 else:
-                    node = Vless(client["id"], self.user_number, conf_settings["decryption"], email)
+                    node = Vless(client["id"], self.user_number, conf_settings["decryption"], email, conf_stream["network"], path, host)
 
             elif protocol == "trojan":
                 node = Trojan(self.user_number, client["password"], email)

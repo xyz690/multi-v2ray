@@ -3,8 +3,8 @@
 import os
 import sys
 import subprocess
-import pkg_resources
 
+from v2ray_util import run_type
 from .util_core.v2ray import V2ray
 from .util_core.utils import ColorStr, open_port, loop_input_choice_number
 from .global_setting import stats_ctr, iptables_ctr, ban_bt, update_timer
@@ -16,18 +16,19 @@ def help():
     lang = Config().get_data('lang')
     if lang == 'zh':
         print("""
-{0} [-h|--help] [options]
-    -h, --help           查看帮助
-    -v, --version        查看版本号
-    start                启动 V2Ray
-    stop                 停止 V2Ray
-    restart              重启 V2Ray
-    status               查看 V2Ray 运行状态
-    new                  重建新的v2ray json配置文件
-    update               更新 V2Ray 到最新Release版本
+{0} [-h|help] [options]
+    -h, help             查看帮助
+    -v, version          查看版本号
+    start                启动 {bin}
+    stop                 停止 {bin}
+    restart              重启 {bin}
+    status               查看 {bin} 运行状态
+    new                  重建新的{bin} json配置文件
+    update               更新 {bin} 到最新Release版本
+    update [version]     更新 {bin} 到指定版本
     update.sh            更新 multi-v2ray 到最新版本
-    add                  新增mkcp + 随机一种 (srtp|wechat-video|utp|dtls|wireguard) header伪装的端口(Group)
-    add [wechat|utp|srtp|dtls|wireguard|socks|mtproto|ss]     新增一种协议的组，端口随机,如 v2ray add utp 为新增utp协议
+    add                  新增端口组
+    add [protocol]       新增一种协议的组, 端口随机, 如 {bin} add utp 为新增utp协议
     del                  删除端口组
     info                 查看配置
     port                 修改端口
@@ -35,37 +36,40 @@ def help():
     tfo                  修改tcpFastOpen
     stream               修改传输协议
     cdn                  走cdn
-    stats                v2ray流量统计
+    stats                {bin}流量统计
     iptables             iptables流量统计
     clean                清理日志
     log                  查看日志
-        """.format(exec_name[exec_name.rfind("/") + 1:]))
+    rm                   卸载{bin}
+        """.format(exec_name[exec_name.rfind("/") + 1:], bin=run_type))
     else:
         print("""
-{0} [-h|--help] [options]
-    -h, --help           get help
-    -v, --version        get version
-    start                start V2Ray
-    stop                 stop V2Ray
-    restart              restart V2Ray
-    status               check V2Ray status
+{0} [-h|help] [options]
+    -h, help             get help
+    -v, version          get version
+    start                start {bin}
+    stop                 stop {bin}
+    restart              restart {bin}
+    status               check {bin} status
     new                  create new json profile
-    update               update v2ray to latest
+    update               update {bin} to latest
+    update [version]     update {bin} to special version
     update.sh            update multi-v2ray to latest
-    add                  random create mkcp + (srtp|wechat-video|utp|dtls|wireguard) fake header group
-    add [wechat|utp|srtp|dtls|wireguard|socks|mtproto|ss]     create special protocol, random new port
+    add                  add new group
+    add [protocol]       create special protocol, random new port
     del                  delete port group
-    info                 check v2ray profile
+    info                 check {bin} profile
     port                 modify port
     tls                  modify tls
     tfo                  modify tcpFastOpen
     stream               modify protocol
     cdn                  cdn mode
-    stats                v2ray traffic statistics
+    stats                {bin} traffic statistics
     iptables             iptables traffic statistics
-    clean                clean v2ray log
-    log                  check v2ray log
-        """.format(exec_name[exec_name.rfind("/") + 1:]))
+    clean                clean {bin} log
+    log                  check {bin} log
+    rm                   uninstall {bin}
+        """.format(exec_name[exec_name.rfind("/") + 1:], bin=run_type))
 
 def updateSh():
     if os.path.exists("/.dockerenv"):
@@ -84,9 +88,9 @@ def parse_arg():
             V2ray.stop()
         elif sys.argv[1] == "restart":
             V2ray.restart()
-        elif sys.argv[1] in ("-h", "--help"):
+        elif sys.argv[1] in ("-h", "help"):
             help()
-        elif sys.argv[1] in ("-v", "--version"):
+        elif sys.argv[1] in ("-v", "version"):
             V2ray.version()
         elif sys.argv[1] == "status":
             V2ray.status()
@@ -116,19 +120,26 @@ def parse_arg():
             updateSh()
         elif sys.argv[1] == "new":
             V2ray.new()
-        elif sys.argv[1] == "convert":
-            V2ray.convert()
         elif sys.argv[1] == "log":
             V2ray.log()
         elif sys.argv[1] == "cdn":
             cdn.modify()
+        elif sys.argv[1] == "rm":
+            V2ray.remove()
     else:
         if sys.argv[1] == "add":
             multiple.new_port(sys.argv[2])
+        elif sys.argv[1] == "update":
+            V2ray.update(sys.argv[2])
+        elif sys.argv[1] == "log":
+            if sys.argv[2] in ("error", "e"):
+                V2ray.log(True)
+            elif sys.argv[2] in ("access", "a"):
+                V2ray.log()
     sys.exit(0)
 
 def service_manage():
-    show_text = (_("start v2ray"), _("stop v2ray"), _("restart v2ray"), _("v2ray status"), _("v2ray log"))
+    show_text = (_("start {}".format(run_type)), _("stop {}".format(run_type)), _("restart {}".format(run_type)), _("{} status".format(run_type)), _("{} log".format(run_type)))
     print("")
     for index, text in enumerate(show_text): 
         print("{}.{}".format(index + 1, text))
@@ -195,7 +206,7 @@ def profile_alter():
         cdn.modify()
 
 def global_setting():
-    show_text = (_("V2ray Traffic Statistics"), _("Iptables Traffic Statistics"), _("Ban Bittorrent"), _("Schedule Update V2ray"), _("Clean Log"), _("Change Language"))
+    show_text = (_("{} Traffic Statistics".format(run_type.capitalize())), _("Iptables Traffic Statistics"), _("Ban Bittorrent"), _("Schedule Update {}".format(run_type.capitalize())), _("Clean {} Log".format(run_type.capitalize())), _("Change Language"))
     print("")
     for index, text in enumerate(show_text): 
         print("{}.{}".format(index + 1, text))
@@ -223,9 +234,9 @@ def menu():
     parse_arg()
     while True:
         print("")
-        print(ColorStr.cyan(_("Welcome to v2ray-util")))
+        print(ColorStr.cyan(_("Welcome to {} manager".format(run_type))))
         print("")
-        show_text = (_("1.V2ray Manage"), _("2.Group Manage"), _("3.Modify Config"), _("4.Check Config"), _("5.Global Setting"), _("6.Update V2Ray"), _("7.Generate Client Json"))
+        show_text = (_("1.{} Manage".format(run_type.capitalize())), _("2.Group Manage"), _("3.Modify Config"), _("4.Check Config"), _("5.Global Setting"), _("6.Update {}".format(run_type.capitalize())), _("7.Generate Client Json"))
         for index, text in enumerate(show_text): 
             if index % 2 == 0:
                 print('{:<20}'.format(text), end="")   
